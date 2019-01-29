@@ -108,14 +108,14 @@ LGD_GYRO_Z_MSB = 0x2D
 
 
 if b.read_byte_data(LSM, LSM_WHOAMI_ADDRESS) == LSM_WHOAMI_CONTENTS:
-    print 'LSM303D detected successfully on I2C bus '+str(busNum)+'.'
+    print('LSM303D detected successfully on I2C bus '+str(busNum)+'.')
 else:
-    print 'No LSM303D detected on bus on I2C bus '+str(busNum)+'.'
+    print('No LSM303D detected on bus on I2C bus '+str(busNum)+'.')
 
 if b.read_byte_data(LGD, LGD_WHOAMI_ADDRESS) == LGD_WHOAMI_CONTENTS:
-    print 'L3GD20H detected successfully on I2C bus '+str(busNum)+'.'
+    print('L3GD20H detected successfully on I2C bus '+str(busNum)+'.')
 else:
-    print 'No L3GD20H detected on bus on I2C bus '+str(busNum)+'.'
+    print('No L3GD20H detected on bus on I2C bus '+str(busNum)+'.')
 
 #Set up the chips for reading  ----------------------
     
@@ -151,8 +151,8 @@ while True:
     magx = magx * mag_factor
     magy = magy * mag_factor
     magz = magz * mag_factor
-    print "compass (in gauss): x: ", magx, " y: ", magy, " z: ", magz
-    print "Note: 1 tesla = 10,000 gauss\n" 
+    print("compass (in gauss): x: ", magx, " y: ", magy, " z: ", magz)
+    print("Note: 1 tesla = 10,000 gauss\n")
 
     # temp: 
     # temp_factor = 1.0/8.0
@@ -164,14 +164,14 @@ while True:
     accx = accx * acc_factor
     accy = accy * acc_factor
     accz = accz * acc_factor
-    print "acc (in g): x: ", accx, " y: ", accy, " z: ", accz
-    print "Note: 1 g = 9.8N\n"
+    print("acc (in g): x: ", accx, " y: ", accy, " z: ", accz)
+    print("Note: 1 g = 9.8N\n")
     # gyro defaults: range: +/- 245dps conversion factor: 8.75 mdps/digit
     gyro_factor = 8.75 / 1000.0
     gyrox = gyrox * gyro_factor
     gyroy = gyroy * gyro_factor
     gyroz = gyroz * gyro_factor
 
-    print "gryo (in deg per sec): x: ", gyrox, " y: ", gyroy, " z: ", gyroz 
-    print "------------------------------------"
+    print("gryo (in deg per sec): x: ", gyrox, " y: ", gyroy, " z: ", gyroz )
+    print("------------------------------------")
  
