@@ -19,18 +19,18 @@ p.start(5)
 
 try:
     while True:
-        print "Going CCW..."
+        print("Going CCW...")
         GPIO.output(INT1_PIN, HIGH)
         GPIO.output(INT2_PIN, LOW)
-        p.ChangeDutyCycle(30)
+        p.ChangeDutyCycle(10)
         time.sleep(5)
-        print "Going CCW, now faster..."
-        p.ChangeDutyCycle(70)
+        print("Going CCW, now faster...")
+        p.ChangeDutyCycle(20)
         time.sleep(5)
-        print "Going CW slowly..."
+        print("Going CW slowly...")
         GPIO.output(INT1_PIN, LOW)
         GPIO.output(INT2_PIN, HIGH)
-        p.ChangeDutyCycle(30)
+        p.ChangeDutyCycle(10)
         time.sleep(5)
 except KeyboardInterrupt:
     p.stop()
