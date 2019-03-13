@@ -7,11 +7,11 @@ GPIO.setmode(GPIO.BCM)
  
 #set GPIO Pins
 GPIO_TRIGGER = 20
-GPIO_ECHO = 21
+GPIO_ECHO = 20
  
 #set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
-GPIO.setup(GPIO_ECHO, GPIO.IN)
+#GPIO.setup(GPIO_ECHO, GPIO.IN)
  
 def distance():
     # set Trigger to HIGH
@@ -21,6 +21,7 @@ def distance():
     time.sleep(0.00001)
     GPIO.output(GPIO_TRIGGER, False)
  
+    GPIO.setup(GPIO_ECHO, GPIO.IN)
     StartTime = time.time()
     StopTime = time.time()
  
@@ -38,6 +39,7 @@ def distance():
     # and divide by 2, because there and back
     distance = (TimeElapsed * 34300) / 2
  
+    GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
     return distance
  
 if __name__ == '__main__':
