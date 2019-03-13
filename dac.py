@@ -14,11 +14,11 @@ dac = adafruit_mcp4725.MCP4725(i2c)
 while True:
     start = time.time()
     # Go up the 12-bit raw range.
-    print('Going up 0-3.3V...')
+    print('Going up 0-5V...')
     for i in range(4095):
         dac.raw_value = i
     # Go back down the 12-bit raw range.
-    print('Going down 3.3-0V...')
+    print('Going down 5-0V...')
     for i in range(4095, -1, -1):
         dac.raw_value = i
     end = time.time()
