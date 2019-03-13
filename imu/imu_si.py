@@ -45,7 +45,7 @@ busNum = 1
 b = SMBus(busNum)
 
 ## LSM303D Registers --------------------------------------------------------------
-LSM = 0x1d #Device I2C slave address
+LSM = 0x6b #Device I2C slave address
 
 LSM_WHOAMI_ADDRESS = 0x0F
 LSM_WHOAMI_CONTENTS = 0b1001001 #Device self-id
@@ -53,15 +53,15 @@ LSM_WHOAMI_CONTENTS = 0b1001001 #Device self-id
 #Control register addresses -- from LSM303D datasheet
 
 LSM_CTRL_0 = 0x1F #General settings
-LSM_CTRL_1 = 0x20 #Turns on accelerometer and configures data rate
-LSM_CTRL_2 = 0x21 #Self test accelerometer, anti-aliasing accel filter
-LSM_CTRL_3 = 0x22 #Interrupts
-LSM_CTRL_4 = 0x23 #Interrupts
-LSM_CTRL_5 = 0x24 #Turns on temperature sensor
-LSM_CTRL_6 = 0x25 #Magnetic resolution selection, data rate config
-LSM_CTRL_7 = 0x26 #Turns on magnetometer and adjusts mode
+LSM_CTRL_1 = 0x10 #Turns on accelerometer and configures data rate
+LSM_CTRL_2 = 0x11 #Self test accelerometer, anti-aliasing accel filter
+LSM_CTRL_3 = 0x12 #Interrupts
+LSM_CTRL_4 = 0x13 #Interrupts
+LSM_CTRL_5 = 0x14 #Turns on temperature sensor
+LSM_CTRL_6 = 0x15 #Magnetic resolution selection, data rate config
+LSM_CTRL_7 = 0x16 #Turns on magnetometer and adjusts mode
 
-#Registers holding twos-complemented MSB and LSB of magnetometer readings -- from LSM303D datasheet
+#Registers holding twos-complemented MSB and LSB of magnetometer readings -- from LSM6DS33 datasheet
 LSM_MAG_X_LSB = 0x08 # x
 LSM_MAG_X_MSB = 0x09
 LSM_MAG_Y_LSB = 0x0A # y
@@ -77,32 +77,40 @@ LSM_ACC_Y_MSB = 0x2B
 LSM_ACC_Z_LSB = 0x2C # z
 LSM_ACC_Z_MSB = 0x2D
 
+LSM_GYRO_X_LSB = 0x22 # x
+LSM_GYRO_X_MSB = 0x23
+LSM_GYRO_Y_LSB = 0x24 # y
+LSM_GYRO_Y_MSB = 0x25
+LSM_GYRO_Z_LSB = 0x26 # z
+LSM_GYRO_Z_MSB = 0x27
+
+
 #Registers holding 12-bit right justified, twos-complemented temperature data -- from LSM303D datasheet
 LSM_TEMP_MSB = 0x05
 LSM_TEMP_LSB = 0x06
 
-# L3GD20H registers ----------------------------------------------------
+# LIS3MDL registers ----------------------------------------------------
 
-LGD = 0x6b #Device I2C slave address
+LGD = 0x1e #Device I2C slave address
 LGD_WHOAMI_ADDRESS = 0x0F
-LGD_WHOAMI_CONTENTS = 0b11010111 #Device self-id
+LGD_WHOAMI_CONTENTS = 0b00111101 #Device self-id
 
-LGD_CTRL_1 = 0x20 #turns on gyro
+LGD_CTRL_1 = 0x20 #turns on magnetometer
 LGD_CTRL_2 = 0x21 #can set a high-pass filter for gyro
 LGD_CTRL_3 = 0x22
 LGD_CTRL_4 = 0x23 #default full scale is 245dps
 LGD_CTRL_5 = 0x24
-LGD_CTRL_6 = 0x25
 
-LGD_TEMP = 0x26
+LGD_TEMP_L = 0x2E
+LGD_TEMP_H = 0x2F
 
-#Registers holding gyroscope readings
-LGD_GYRO_X_LSB = 0x28
-LGD_GYRO_X_MSB = 0x29
-LGD_GYRO_Y_LSB = 0x2A
-LGD_GYRO_Y_MSB = 0x2B
-LGD_GYRO_Z_LSB = 0x2C
-LGD_GYRO_Z_MSB = 0x2D
+#Registers holding mag readings
+LGD_MAG_X_LSB = 0x28
+LGD_MAG_X_MSB = 0x29
+LGD_MAG_Y_LSB = 0x2A
+LGD_MAG_Y_MSB = 0x2B
+LGD_MAG_Z_LSB = 0x2C
+LGD_MAG_Z_MSB = 0x2D
 
 #Ensure chip is detected properly on the bus ----------------------
 
@@ -119,22 +127,22 @@ else:
 
 #Set up the chips for reading  ----------------------
     
-b.write_byte_data(LSM, LSM_CTRL_1, 0b1010111) # enable accelerometer, 50 hz sampling
-b.write_byte_data(LSM, LSM_CTRL_2, 0x00) #set +/- 2g full scale
+b.write_byte_data(LSM, LSM_CTRL_1, 0b10100011) # enable accelerometer, 50 hz sampling, set +/- 2g full scale
+b.write_byte_data(LSM, LSM_CTRL_2, 0x01010010) # gyro settings
 #b.write_byte_data(LSM, LSM_CTRL_5, 0b11100100) #high resolution mode, thermometer on, 6.25hz ODR
 b.write_byte_data(LSM, LSM_CTRL_5, 0b01100100) #high resolution mode, thermometer off, 6.25hz ODR
 b.write_byte_data(LSM, LSM_CTRL_6, 0b00100000) # set +/- 4 gauss full scale
 b.write_byte_data(LSM, LSM_CTRL_7, 0x00) #get magnetometer out of low power mode
 
-b.write_byte_data(LGD, LGD_CTRL_1, 0x0F) #turn on gyro and set to normal mode
+b.write_byte_data(LGD, LGD_CTRL_1, 0x01011000) #turn on magnetometer and set to normal mode, no temp, 40 Hz
 
 #Read data from the chips ----------------------
 
 while True:
     time.sleep(0.5)
-    magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
-    magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
-    magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
+    magx = twos_comp_combine(b.read_byte_data(LGD, LGD_MAG_X_MSB), b.read_byte_data(LGD, LGD_MAG_X_LSB))
+    magy = twos_comp_combine(b.read_byte_data(LGD, LGD_MAG_Y_MSB), b.read_byte_data(LGD, LGD_MAG_Y_LSB))
+    magz = twos_comp_combine(b.read_byte_data(LGD, LGD_MAG_Z_MSB), b.read_byte_data(LGD, LGD_MAG_Z_LSB))
     #mag_temp = twos_comp_12b(b.read_byte_data(LSM, LSM_TEMP_MSB) , b.read_byte_data(LSM, LSM_TEMP_LSB))
     #mag_temp = twos_comp_12b(b.read_byte_data(LSM, LSM_TEMP_MSB) , b.read_byte_data(LSM, LSM_TEMP_LSB))
     
@@ -142,9 +150,9 @@ while True:
     accy = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Y_MSB), b.read_byte_data(LSM, LSM_ACC_Y_LSB))
     accz = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Z_MSB), b.read_byte_data(LSM, LSM_ACC_Z_LSB))
 
-    gyrox = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_X_MSB), b.read_byte_data(LGD, LGD_GYRO_X_LSB))
-    gyroy = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Y_MSB), b.read_byte_data(LGD, LGD_GYRO_Y_LSB))
-    gyroz = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Z_MSB), b.read_byte_data(LGD, LGD_GYRO_Z_LSB))
+    gyrox = twos_comp_combine(b.read_byte_data(LSM, LSM_GYRO_X_MSB), b.read_byte_data(LSM, LSM_GYRO_X_LSB))
+    gyroy = twos_comp_combine(b.read_byte_data(LSM, LSM_GYRO_Y_MSB), b.read_byte_data(LSM, LSM_GYRO_Y_LSB))
+    gyroz = twos_comp_combine(b.read_byte_data(LSM, LSM_GYRO_Z_MSB), b.read_byte_data(LSM, LSM_GYRO_Z_LSB))
 
     # compass settings: +/- 4 gauss, 0.160 mgauss/LSB
     mag_factor = 0.160/1000.0
@@ -168,9 +176,9 @@ while True:
     print("Note: 1 g = 9.8N\n")
     # gyro defaults: range: +/- 245dps conversion factor: 8.75 mdps/digit
     gyro_factor = 8.75 / 1000.0
-    gyrox = gyrox * gyro_factor
-    gyroy = gyroy * gyro_factor
-    gyroz = gyroz * gyro_factor
+    gyrox = gyrox * gyro_factor -48
+    gyroy = gyroy * gyro_factor -44
+    gyroz = gyroz * gyro_factor -32
 
     print("gryo (in deg per sec): x: ", gyrox, " y: ", gyroy, " z: ", gyroz )
     print("------------------------------------")
