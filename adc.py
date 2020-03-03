@@ -14,5 +14,5 @@ t = ()
 val = ()
 for i in range(0,1000):
     t = t + (i,)
-    print(chan.voltage)
+    print("%.2f V" % chan.voltage)
     time.sleep(0.3)
